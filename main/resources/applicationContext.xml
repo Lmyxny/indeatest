@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://cxf.apache.org/jaxws
+       http://cxf.apache.org/schemas/jaxws.xsd
+       http://cxf.apache.org/jaxrs
+       http://cxf.apache.org/schemas/jaxrs.xsd">
+
+    <context:component-scan base-package="com.maina.ainana"/>
+
+    <context:property-placeholder location="classpath:dbConfig.properties"/>
+
+   <bean id="dataSourceMysql" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${driverClassName}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+   <bean id="dataSourceOracle" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${OradriverClassName}"/>
+        <property name="url" value="${Oraurl}"/>
+        <property name="username" value="${Orajdbc.username}"/>
+        <property name="password" value="${Orajdbc.password}"/>
+    </bean>
+
+    <bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="configLocation" value="classpath:mybatis-config.xml" />
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.maina.ainana.mapper" />
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactoryBean" />
+    </bean>
+
+    <jaxws:endpoint address="/maina_user" implementorClass="com.maina.ainana.server.MainaSsoServer">
+        <jaxws:implementor>
+            <bean class="com.maina.ainana.server.MainaSsoServerImpl"/>
+        </jaxws:implementor>
+    </jaxws:endpoint>
+
+
+    <jaxrs:server address="/rest">
+        <jaxrs:serviceBeans>
+            <bean class="com.maina.ainana.server.MainaRestServerImpl"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+
+    <bean id="dataSource" class="com.maina.ainana.DataSourceUtil.MyRoutingDataSource">
+        <property name="targetDataSources">
+            <map key-type="java.lang.String">
+                <entry key="1" value-ref="dataSourceMysql"></entry>
+                <entry key="2" value-ref="dataSourceOracle"></entry>
+            </map>
+        </property>
+        <property name="defaultTargetDataSource" ref="dataSourceMysql"/>
+    </bean>
+</beans>
