@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.maina.ainana.mapper.MainaSsoMapper">
+
+	<select id="select_login_user_info" resultType="com.maina.ainana.pojo.T_MALL_USER_ACCOUNT"
+		parameterType="com.maina.ainana.pojo.T_MALL_USER_ACCOUNT">
+		SELECT * FROM t_mall_user_account where yh_mch=#{yh_mch}
+	</select>
+	
+	<select id="select_user_address_info" resultType="com.maina.ainana.pojo.T_MALL_ADDRESS">
+		select * from t_mall_address where yh_id=#{yh_id}
+	</select>
+	
+    <select id="select_user_address_byId" parameterType="int" resultType="com.maina.ainana.pojo.T_MALL_ADDRESS">
+		select * from t_mall_address where id=#{id}
+	</select>
+
+
+</mapper>
